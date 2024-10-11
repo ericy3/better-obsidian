@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Vault } from 'obsidian';
 
 // Remember to rename these classes and interfaces!
 
@@ -17,12 +17,26 @@ export default class MyPlugin extends Plugin {
 		await this.loadSettings();
 
 		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
+		const ribbonIconEl = this.addRibbonIcon('dice', 'Diary Recall', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
+			new Notice('This is what you wrote!');
+			
+			// An existing leaf that can be navigated to
+			const leaf = this.app.workspace.getLeaf(false);
+			const dir = "Diary"
+			const all_entries = this.app.vault.getFiles().filter(f => f.path.startsWith(dir));
+			console.log(all_entries.map(e => e.basename))
+			
+			// Randomly select an entry
+			const entry = all_entries[Math.floor(Math.random() * all_entries.length)];
+
+			leaf.openFile(entry);
 		});
+
 		// Perform additional things with the ribbon
 		ribbonIconEl.addClass('my-plugin-ribbon-class');
+
+
 
 		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
 		const statusBarItemEl = this.addStatusBarItem();
