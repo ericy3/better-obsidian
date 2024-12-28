@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Vault } from 'obsidian';
 
 // Remember to rename these classes and interfaces!
 
@@ -17,12 +17,69 @@ export default class MyPlugin extends Plugin {
 		await this.loadSettings();
 
 		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
+		const randomizeIconEl = this.addRibbonIcon('dice', 'Diary Recall', (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
+			new Notice('This is what you wrote!');
+			
+			// An existing leaf that can be navigated to
+			const leaf = this.app.workspace.getLeaf(false);
+			const dir = "Diary";
+			const all_entries = this.app.vault.getFiles().filter(f => f.path.startsWith(dir));
+			console.log(all_entries.map(e => e.basename))
+			
+			// Randomly select an entry
+			const entry = all_entries[Math.floor(Math.random() * all_entries.length)];
+
+			leaf.openFile(entry);
 		});
+
 		// Perform additional things with the ribbon
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
+		randomizeIconEl.addClass('randomize-ribbon-class');
+		
+
+		const organizeIconEl = this.addRibbonIcon('folders', 'Organize', (evt: MouseEvent) => {
+			
+			const leaf = this.app.workspace.getLeaf(false);
+			const dir = "Diary";
+			const all_entries = this.app.vault.getFiles().filter(f => f.path.startsWith(dir));
+
+			const months = [ "January", "February", "March", "April", "May", "June", 
+				"July", "August", "September", "October", "November", "December" ];
+
+			// TODO: Create a map of years to months map or entries
+			const yearMap = new Map<string, string[]>();
+
+			// Create a map of months to entries
+			// TODO: Only consider months that are present in the entries
+			const monthMap = new Map<string, string[]>();
+			for (let i = 0; i < months.length; i++) {
+				monthMap.set(months[i], []);
+			}
+
+			
+			for (let i = 0; i < all_entries.length; i++) {
+				const entry = all_entries[i];
+				const entryInfo = entry.basename.split("-");
+				console.log(entryInfo);
+				const year = entryInfo[0];
+				const month = entryInfo[1];
+				const title = entryInfo[3];
+
+				// Push title or file itself?
+				monthMap.get(months[parseInt(month)])?.push(title);
+			}
+			for (let i = 0; i < yearMap.size; i++) {
+				for (let j = 0; j < monthMap.size; j++) {
+					if (monthMap.get(months[j])?.length != 0) {
+						this.app.vault.createFolder(`${dir}/${year}/${months[j]}`);
+					}
+				}
+			}
+		});
+
+		organizeIconEl.addClass('organize-ribbon-class');
+
+		
 
 		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
 		const statusBarItemEl = this.addStatusBarItem();
