@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Vault } from 'obsidian';
+import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
 // Remember to rename these classes and interfaces!
 
@@ -39,7 +39,7 @@ export default class MyPlugin extends Plugin {
 
 		const organizeIconEl = this.addRibbonIcon('folders', 'Organize', (evt: MouseEvent) => {
 			
-			const leaf = this.app.workspace.getLeaf(false);
+			// const leaf = this.app.workspace.getLeaf(false);
 			const dir = "Diary";
 			const all_entries = this.app.vault.getFiles().filter(f => f.path.startsWith(dir));
 
@@ -47,34 +47,48 @@ export default class MyPlugin extends Plugin {
 				"July", "August", "September", "October", "November", "December" ];
 
 			// TODO: Create a map of years to months map or entries
-			const yearMap = new Map<string, string[]>();
+			const yearMap = new Map<string, Map<string, string[]>>();
 
-			// Create a map of months to entries
-			// TODO: Only consider months that are present in the entries
-			const monthMap = new Map<string, string[]>();
-			for (let i = 0; i < months.length; i++) {
-				monthMap.set(months[i], []);
-			}
 
-			
 			for (let i = 0; i < all_entries.length; i++) {
 				const entry = all_entries[i];
+
+				// Split up title of format "YYYY-MM-DD - Title"
 				const entryInfo = entry.basename.split("-");
 				console.log(entryInfo);
 				const year = entryInfo[0];
-				const month = entryInfo[1];
-				const title = entryInfo[3];
-
-				// Push title or file itself?
-				monthMap.get(months[parseInt(month)])?.push(title);
-			}
-			for (let i = 0; i < yearMap.size; i++) {
-				for (let j = 0; j < monthMap.size; j++) {
-					if (monthMap.get(months[j])?.length != 0) {
-						this.app.vault.createFolder(`${dir}/${year}/${months[j]}`);
-					}
+				const month = entryInfo[1];				
+				
+				// Check if folder for given year exists and create one if not
+				const yearFolderExists = this.app.vault.getFolderByPath(`${dir}/${year}`);
+				if (!yearFolderExists) {
+					this.app.vault.createFolder(`${dir}/${year}`);
 				}
+
+				// Create a map of months to entries for given year if doesn't exist
+				if (!yearMap.has(year)) {
+					yearMap.set(year, new Map<string, string[]>());
+				} 
+
+				// Create a month entry for given year if doesn't exist
+				const currYearMonthMap = yearMap.get(year);
+				if (!currYearMonthMap?.has(months[parseInt(month)])) {
+					currYearMonthMap?.set(months[parseInt(month)], []);
+				}
+
+				// Add entry to month
+				currYearMonthMap?.get(months[parseInt(month)])?.push(entry.basename);
+
+				// Check if folder for given month exists and create one if not
+				const monthFolderExists = this.app.vault.getFolderByPath(`${dir}/${year}/${months[parseInt(month)]}`);
+				if (!monthFolderExists) {
+					this.app.vault.createFolder(`${dir}/${year}/${months[parseInt(month)]}`);
+				}
+
+				// Move entry to month folder
+				this.app.vault.rename(entry, `${dir}/${year}/${months[parseInt(month)]}/${entry.basename}`);
 			}
+
 		});
 
 		organizeIconEl.addClass('organize-ribbon-class');
