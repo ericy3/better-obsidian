@@ -39,7 +39,6 @@ export default class MyPlugin extends Plugin {
 
 		const organizeIconEl = this.addRibbonIcon('folders', 'Organize', async (evt: MouseEvent) => {
 			
-			// const leaf = this.app.workspace.getLeaf(false);
 			const dir = "Diary";
 			const all_entries = this.app.vault.getFiles().filter(f => f.path.startsWith(dir));
 
@@ -58,13 +57,13 @@ export default class MyPlugin extends Plugin {
 				if (entryInfo.length < 2) {
 					continue;
 				}
-				console.log(entryInfo);
+				new Notice(entryInfo.concat("").join("\n"));
 				const year = entryInfo[0];
-				const month = entryInfo[1];				
+				const month = entryInfo[1];			
 				
 				// Check if folder for given year exists and create one if not
 				const yearFolderPath = `${dir}/${year}`;
-				const yearFolderExists = this.app.vault.getFolderByPath(yearFolderPath);
+				const yearFolderExists = await this.app.vault.getFolderByPath(yearFolderPath);
 				if (!yearFolderExists) {
 					await this.app.vault.createFolder(yearFolderPath);
 				}
@@ -89,13 +88,11 @@ export default class MyPlugin extends Plugin {
 				if (monthFolderExists == null) {
 					await this.app.vault.createFolder(monthFolderPath);
 				}
-				new Notice(String(monthFolderExists));
-				// Move entry to month folder
-				if (monthFolderExists != null) {
-					const newFilePath = `${monthFolderPath}/${entry.basename}`;
-					await this.app.fileManager.renameFile(entry, newFilePath);
-					// new Notice(`Hi`);
-				}
+
+				const newFilePath = `${monthFolderPath}/${entry.basename}.${entry.extension}`;
+				new Notice(String(newFilePath), 0);
+				await this.app.vault.rename(entry, newFilePath);
+				
 			}
 
 		});
