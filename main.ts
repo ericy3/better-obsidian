@@ -37,14 +37,14 @@ export default class MyPlugin extends Plugin {
 		randomizeIconEl.addClass('randomize-ribbon-class');
 		
 
-		const organizeIconEl = this.addRibbonIcon('folders', 'Organize', (evt: MouseEvent) => {
+		const organizeIconEl = this.addRibbonIcon('folders', 'Organize', async (evt: MouseEvent) => {
 			
 			// const leaf = this.app.workspace.getLeaf(false);
 			const dir = "Diary";
 			const all_entries = this.app.vault.getFiles().filter(f => f.path.startsWith(dir));
 
-			const months = [ "January", "February", "March", "April", "May", "June", 
-				"July", "August", "September", "October", "November", "December" ];
+			const months = [ "1", "2", "3", "4", "5", "6", 
+				"7", "8", "9", "10", "11", "12" ];
 
 			// TODO: Create a map of years to months map or entries
 			const yearMap = new Map<string, Map<string, string[]>>();
@@ -55,38 +55,47 @@ export default class MyPlugin extends Plugin {
 
 				// Split up title of format "YYYY-MM-DD - Title"
 				const entryInfo = entry.basename.split("-");
+				if (entryInfo.length < 2) {
+					continue;
+				}
 				console.log(entryInfo);
 				const year = entryInfo[0];
 				const month = entryInfo[1];				
 				
 				// Check if folder for given year exists and create one if not
-				const yearFolderExists = this.app.vault.getFolderByPath(`${dir}/${year}`);
+				const yearFolderPath = `${dir}/${year}`;
+				const yearFolderExists = this.app.vault.getFolderByPath(yearFolderPath);
 				if (!yearFolderExists) {
-					this.app.vault.createFolder(`${dir}/${year}`);
+					await this.app.vault.createFolder(yearFolderPath);
 				}
 
 				// Create a map of months to entries for given year if doesn't exist
 				if (!yearMap.has(year)) {
 					yearMap.set(year, new Map<string, string[]>());
 				} 
-
+				
+				const monthNum = parseInt(month) - 1;
 				// Create a month entry for given year if doesn't exist
 				const currYearMonthMap = yearMap.get(year);
-				if (!currYearMonthMap?.has(months[parseInt(month)])) {
-					currYearMonthMap?.set(months[parseInt(month)], []);
+				if (!currYearMonthMap?.has(months[monthNum])) {
+					currYearMonthMap?.set(months[monthNum], []);
 				}
 
 				// Add entry to month
-				currYearMonthMap?.get(months[parseInt(month)])?.push(entry.basename);
-
+				currYearMonthMap?.get(months[monthNum])?.push(entry.basename);
+				const monthFolderPath = `${yearFolderPath}/${months[monthNum]}`;
 				// Check if folder for given month exists and create one if not
-				const monthFolderExists = this.app.vault.getFolderByPath(`${dir}/${year}/${months[parseInt(month)]}`);
-				if (!monthFolderExists) {
-					this.app.vault.createFolder(`${dir}/${year}/${months[parseInt(month)]}`);
+				const monthFolderExists = await this.app.vault.getFolderByPath(monthFolderPath);
+				if (monthFolderExists == null) {
+					await this.app.vault.createFolder(monthFolderPath);
 				}
-
+				new Notice(String(monthFolderExists));
 				// Move entry to month folder
-				this.app.vault.rename(entry, `${dir}/${year}/${months[parseInt(month)]}/${entry.basename}`);
+				if (monthFolderExists != null) {
+					const newFilePath = `${monthFolderPath}/${entry.basename}`;
+					await this.app.fileManager.renameFile(entry, newFilePath);
+					// new Notice(`Hi`);
+				}
 			}
 
 		});
