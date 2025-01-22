@@ -57,7 +57,6 @@ export default class MyPlugin extends Plugin {
 				if (entryInfo.length < 2) {
 					continue;
 				}
-				new Notice(entryInfo.concat("").join("\n"));
 				const year = entryInfo[0];
 				const month = entryInfo[1];			
 				
@@ -90,7 +89,7 @@ export default class MyPlugin extends Plugin {
 				}
 
 				const newFilePath = `${monthFolderPath}/${entry.basename}.${entry.extension}`;
-				new Notice(String(newFilePath), 0);
+				// new Notice(String(newFilePath), 0);
 				await this.app.vault.rename(entry, newFilePath);
 				
 			}
