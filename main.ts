@@ -3,11 +3,14 @@ import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Set
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
-	mySetting: string;
+	journalFolder: string;
+	unpackFolder: string;
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
+	journalFolder: 'N/A',
+	unpackFolder: 'N/A',
+
 }
 
 export default class MyPlugin extends Plugin {
@@ -18,17 +21,27 @@ export default class MyPlugin extends Plugin {
 
 		// This creates an icon in the left ribbon.
 		const randomizeIconEl = this.addRibbonIcon('dice', 'Diary Recall', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is what you wrote!');
-			
 			// An existing leaf that can be navigated to
 			const leaf = this.app.workspace.getLeaf(false);
-			const dir = "Diary";
+			const dir = this.settings.journalFolder;
+			if (this.app.vault.getFolderByPath(dir) == null) {
+				new Notice('Your journal folder can\'t be found.')
+				return;
+			}
+			
+			// Fetch all entries in the journal
 			const all_entries = this.app.vault.getFiles().filter(f => f.path.startsWith(dir));
 			console.log(all_entries.map(e => e.basename))
-			
+			if (all_entries.length <= 0) {
+				new Notice('There are no entries!')
+				return;
+			}
+
 			// Randomly select an entry
 			const entry = all_entries[Math.floor(Math.random() * all_entries.length)];
+
+			// Called when the user clicks the icon and the file exists.
+			new Notice('This is what you wrote!');
 
 			leaf.openFile(entry);
 		});
@@ -39,13 +52,17 @@ export default class MyPlugin extends Plugin {
 
 		const organizeIconEl = this.addRibbonIcon('folders', 'Organize', async (evt: MouseEvent) => {
 			
-			const dir = "Diary";
+			const dir = this.settings.journalFolder;
+			if (this.app.vault.getFolderByPath(dir) == null) {
+				new Notice("Your journal folder can't be found!")
+				return
+			}
+
 			const all_entries = this.app.vault.getFiles().filter(f => f.path.startsWith(dir));
 
 			const months = [ "1", "2", "3", "4", "5", "6", 
 				"7", "8", "9", "10", "11", "12" ];
 
-			// TODO: Create a map of years to months map or entries
 			const yearMap = new Map<string, Map<string, string[]>>();
 
 
@@ -197,14 +214,27 @@ class SampleSettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
+			.setName('Journal Folder')
+			.setDesc('Name of folder that holds your daily notes.')
 			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
+				.setPlaceholder('N/A')
+				.setValue(this.plugin.settings.journalFolder)
 				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
+					this.plugin.settings.journalFolder = value;
 					await this.plugin.saveSettings();
 				}));
+		
+		
+		new Setting(containerEl)
+			.setName('Unpack Folder')
+			.setDesc('Name of the folder you want to unpack.')
+			.addText(text => text
+				.setPlaceholder('N/A')
+				.setValue(this.plugin.settings.unpackFolder)
+				.onChange(async (value) => {
+					this.plugin.settings.unpackFolder = value;
+					await this.plugin.saveSettings();
+				})
+				)
 	}
 }
