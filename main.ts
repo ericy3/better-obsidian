@@ -1,4 +1,5 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { TextInputModal } from 'modal';
 
 // Remember to rename these classes and interfaces!
 
@@ -127,6 +128,15 @@ export default class MyPlugin extends Plugin {
 			name: 'Open sample modal (simple)',
 			callback: () => {
 				new SampleModal(this.app).open();
+			}
+		});
+		// Takes all the files out of folders and deletes folders in a given directory 
+		this.addCommand({
+			id: 'unpack-folder',
+			name: 'Unpack folder',
+			icon: 'folder-open',
+			callback: () => {
+				new TextInputModal(this.app).open();
 			}
 		});
 		// This adds an editor command that can perform some operation on the current editor instance
