@@ -1,4 +1,4 @@
-import { App, Modal, Vault, Plugin, TFile } from 'obsidian';
+import { App, Modal, Vault, Plugin, TFile, Notice, TFolder } from 'obsidian';
 
 export class TextInputModal extends Modal {
     inputField: HTMLInputElement;
@@ -39,13 +39,28 @@ export class TextInputModal extends Modal {
                     moveFile(entry, dir)
                 }
                 const all_folders = this.app.vault.getAllFolders().filter(f => f.path.startsWith(dir));
+                all_folders.sort(pathLengthCompare)
                 for (const folder of [...all_folders]) {
+                    if (folder.path == inputText) {
+                        continue;
+                    }
+                    // new Notice(String(folder.path))
                     this.app.vault.delete(folder, true);
                 }
             }
 
         }
         this.close();
+    }
+}
+
+function pathLengthCompare(a: TFolder, b: TFolder) {
+    if (a.path.length < b.path.length) {
+        return 1;
+    } else if (a.path.length > b.path.length) {
+        return -1;
+    } else {
+        return 0;
     }
 }
 
