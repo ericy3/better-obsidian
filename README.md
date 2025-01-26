@@ -23,7 +23,10 @@ This can be useful in recalling old journal entries to reflect upon.
 
 ### Unpack Folder
 
-This is a command that can be found by using the `Ctrl-P` on Windows and `Cmd-P` on Mac. Typing in 'unpack' should yield a `Better Obsidian: Unpack `
+This is a command that can be found by using the `Ctrl-P` on Windows and `Cmd-P` on Mac. Typing in 'unpack' should yield a `Better Obsidian: Unpack Folder` option.
+Selecting this will open up a pop up in which you will be able to submit a path or folder name given the vault root as the root.
+Unpack Folder removes all folders, nested folders included, inside the specified folder. The files will not be deleted, remaining inside this folder.
+This is helpful in revamping vault structure in cases of folder organzation.
 
 
 ## Manually installing the plugin
