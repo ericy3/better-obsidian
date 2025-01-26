@@ -5,12 +5,12 @@ import { TextInputModal } from 'modal';
 
 interface MyPluginSettings {
 	journalFolder: string;
-	unpackFolder: string;
+	recallFolder: string;
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
 	journalFolder: 'N/A',
-	unpackFolder: 'N/A',
+	recallFolder: 'N/A',
 
 }
 
@@ -24,7 +24,7 @@ export default class MyPlugin extends Plugin {
 		const randomizeIconEl = this.addRibbonIcon('dice', 'Diary Recall', (evt: MouseEvent) => {
 			// An existing leaf that can be navigated to
 			const leaf = this.app.workspace.getLeaf(false);
-			const dir = this.settings.journalFolder;
+			const dir = this.settings.recallFolder;
 			if (this.app.vault.getFolderByPath(dir) == null) {
 				new Notice('Your journal folder can\'t be found.')
 				return;
@@ -236,13 +236,13 @@ class SampleSettingTab extends PluginSettingTab {
 		
 		
 		new Setting(containerEl)
-			.setName('Unpack Folder')
-			.setDesc('Name of the folder you want to unpack.')
+			.setName('Recall Folder')
+			.setDesc('Name of the folder you want to recall from.')
 			.addText(text => text
 				.setPlaceholder('N/A')
-				.setValue(this.plugin.settings.unpackFolder)
+				.setValue(this.plugin.settings.recallFolder)
 				.onChange(async (value) => {
-					this.plugin.settings.unpackFolder = value;
+					this.plugin.settings.recallFolder = value;
 					await this.plugin.saveSettings();
 				})
 				)
