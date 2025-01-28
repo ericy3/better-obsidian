@@ -9,17 +9,28 @@ export class TextInputModal extends Modal {
         this.inputField.type = 'text';
         this.inputField.placeholder = 'Enter your text here';
         this.inputField.style.width = '100%';
+        this.inputField.style.marginTop = "10px";
 
         const submitButton = document.createElement('button');
         submitButton.textContent = 'Submit';
         submitButton.addEventListener('click', () => this.onSubmit());
 
+        submitButton.style.marginTop = '10px';  
+        submitButton.style.padding = '10px 20px';
+        
         this.contentEl.appendChild(this.inputField);
         this.contentEl.appendChild(submitButton);
     }
 
     onOpen() {
         this.inputField.focus();
+
+        this.inputField.addEventListener('keypress', (event) => {
+            if (event.key == "Enter") {
+                event.preventDefault();
+                this.onSubmit()
+            }
+        });
     }
 
     onClose() {
