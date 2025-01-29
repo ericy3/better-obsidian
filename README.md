@@ -10,7 +10,7 @@ The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definiti
 ### Organize Daily Notes
 
 Create a folder to store all your daily notes of format `YYYY-MM-DD [- {TOPIC}]`. 
-After doing so, to the settings tab and under **Community Plugins** and the Better Obsidian tab, update the folder name from "N/A" to the path/to/diary/folder from vault root.
+After doing so, to the settings tab and under **Community Plugins** and the Better Obsidian tab, update the folder name from "N/A" to the `path/to/diary/folder`` from vault root.
 Then click the folder icon on the left side of the app window and it should create year folders, month folders within each year, and place the notes into the appropriate folders.
 Notes not in the `YYYY-MM-DD` format will be directly under the setting specified folder.
 This organize button also works off folders created from previous calls, allowing new files to be placed into the existing year and month folders.
