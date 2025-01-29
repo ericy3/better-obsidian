@@ -65,6 +65,12 @@ export class TextInputModal extends Modal {
     }
 }
 
+export class folderGenerateModal extends TextInputModal {
+    constructor(app: App) {
+        super(app)
+    }
+}
+
 function pathLengthCompare(a: TFolder, b: TFolder) {
     if (a.path.length < b.path.length) {
         return 1;

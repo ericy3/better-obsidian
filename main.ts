@@ -115,7 +115,6 @@ export default class MyPlugin extends Plugin {
 		});
 
 		organizeIconEl.addClass('organize-ribbon-class');
-
 		
 
 		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
@@ -139,6 +138,16 @@ export default class MyPlugin extends Plugin {
 				new TextInputModal(this.app).open();
 			}
 		});
+
+		// Given a folder or directory utilize algorithm to create folder names and organize
+		this.addCommand({
+			id: 'generate-folders',
+			name: 'Generate Folders',
+			callback: () => {
+				
+			}
+		});
+
 		// This adds an editor command that can perform some operation on the current editor instance
 		this.addCommand({
 			id: 'sample-editor-command',
