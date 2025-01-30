@@ -1,5 +1,5 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import { TextInputModal } from 'src/modal';
+import { TextInputModal } from './modal';
 
 // Remember to rename these classes and interfaces!
 
