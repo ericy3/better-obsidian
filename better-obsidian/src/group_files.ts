@@ -6,28 +6,26 @@ export interface FileNames {
 	inputs: string[] | string;
 }
 
-interface ApiResponse {
-	[key: string]: any;
-}
-
 interface FileMapping {
     [key: string]: number;
 }
  
 
-export async function group_files(data: FileNames): Promise<FileMapping>{
+export async function group_files(data: FileNames): Promise<Array<number> | null> {
 	const encoded_files = await encode_files(data);
-	console.log(typeof encoded_files)
 	// let cluster_data: ClusterData = encode_files;
-	// const clustered_files = await cluster_files(encoded_files)
+    // console.log(encoded_files)
+	const file_labels = await cluster_files(encoded_files)
+    // console.log(file_labels)
 
-	return encoded_files;
+
+	return null;
 
 	// const grouped_files = await cluster_files(encode_files);
 }
 
 
-async function encode_files(data: FileNames): Promise<ApiResponse>{
+async function encode_files(data: FileNames): Promise<Array<Array<number>>>{
 	const response = await fetch(
 		"https://api-inference.huggingface.co/models/BAAI/bge-base-en-v1.5",
 		{
@@ -45,12 +43,15 @@ async function encode_files(data: FileNames): Promise<ApiResponse>{
 
 async function cluster_files(data: Array<Array<number>>): Promise<{} | number[]> {
     try {
-        const response = await fetch('http://localhost:5000/cluster', {
+        console.log(data)
+        const requestBody = { inputs: data };
+        console.log("Sending request to /cluster with body:", requestBody);
+        const response = await fetch('http://localhost:8000/cluster', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ data }),
+            body: JSON.stringify(requestBody),
         });
 
         if (!response.ok) {

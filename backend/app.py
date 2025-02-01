@@ -1,24 +1,47 @@
-from flask import Flask, request, jsonify
+from fastapi import FastAPI, Response
+import logging
 from sklearn.cluster import DBSCAN
 import numpy as np
+import json
+from typing import List
+from pydantic import BaseModel
 
-app = Flask(__name__)
+app = FastAPI()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+logger.addHandler(logging.StreamHandler())
 
-@app.route("/cluster", methods=['POST'])
-def clusterFiles():
-    data = request.json.get("data")
+class FileEncodings(BaseModel):
+    inputs: List[List[float]]
+    # inputs: int
+
+@app.get("/")
+def hello_world():
+    return "<p>Hello, World!</p>"
+
+@app.post("/cluster")
+async def clusterFiles(data: FileEncodings):
+    logger.info("COWABUNGA:: \n\n" + str(type(data.inputs)) + "\n\n") 
     if not data:
         return jsonify({"error": "No data provided"}), 400
 
-    data = np.array(data)
-    print(data)
+    data = np.array(data.inputs)
 
-    model = DBSCAN()
-    labels = model.fit(X)
+    model = DBSCAN(eps=0.5, min_samples=1, metric="cosine")
+    labels = model.fit_predict(data)
 
-    return labels
+    logger.info("\n\n\n" + str(labels) + "\n\n\n") 
+    logger.info("\n\n\n" + str(type(labels)) + "\n\n\n") 
 
 
 
-if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=5000)
+    labels = json.dumps(labels.tolist())
+
+    # labels = [1, 2, 3]
+
+    response = Response(
+        content = json.dumps(labels)
+    )
+
+    return response
+
