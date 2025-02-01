@@ -24,4 +24,5 @@ data.json
 # environment variables
 .env
 
+# 
 __pycache__/
