@@ -6,21 +6,17 @@ export interface FileNames {
 	inputs: string[] | string;
 }
 
-interface FileMapping {
-    [key: string]: number;
+interface FileLabels {
+    [key: string]: Array<number>;
 }
  
 
 export async function group_files(data: FileNames): Promise<Array<number> | null> {
 	const encoded_files = await encode_files(data);
 	// let cluster_data: ClusterData = encode_files;
-    // console.log(encoded_files)
-	const file_labels = await cluster_files(encoded_files)
-    // console.log(file_labels)
+	const file_labels: Array<number> = await cluster_files(encoded_files)
 
-
-	return null;
-
+	return file_labels;
 	// const grouped_files = await cluster_files(encode_files);
 }
 
@@ -41,11 +37,9 @@ async function encode_files(data: FileNames): Promise<Array<Array<number>>>{
 	return result;
 } 
 
-async function cluster_files(data: Array<Array<number>>): Promise<{} | number[]> {
+async function cluster_files(data: Array<Array<number>>): Promise<number[]| Array<number>> {
     try {
-        console.log(data)
         const requestBody = { inputs: data };
-        console.log("Sending request to /cluster with body:", requestBody);
         const response = await fetch('http://localhost:8000/cluster', {
             method: 'POST',
             headers: {
@@ -58,7 +52,7 @@ async function cluster_files(data: Array<Array<number>>): Promise<{} | number[]>
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const result = await response.json();
+        const result: FileLabels = await response.json();
         return result.labels;  // Return the clustering labels
     } catch (error) {
         console.error('Error fetching clustering data:', error);
