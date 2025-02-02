@@ -21,7 +21,6 @@ def hello_world():
 
 @app.post("/cluster")
 async def clusterFiles(data: FileEncodings):
-    logger.info("COWABUNGA:: \n\n" + str(type(data.inputs)) + "\n\n") 
     if not data:
         return jsonify({"error": "No data provided"}), 400
 
@@ -33,14 +32,12 @@ async def clusterFiles(data: FileEncodings):
     logger.info("\n\n\n" + str(labels) + "\n\n\n") 
     logger.info("\n\n\n" + str(type(labels)) + "\n\n\n") 
 
+    labelsList = labels.tolist()
 
-
-    labels = json.dumps(labels.tolist())
-
-    # labels = [1, 2, 3]
+    responseContent = json.dumps({"labels": labelsList})
 
     response = Response(
-        content = json.dumps(labels)
+        content = responseContent
     )
 
     return response

@@ -1,0 +1,24 @@
+You have a set of file names, each assigned to a cluster based on semantic similarity. Your task is to determine the best folder name for each cluster and list all file names in that cluster under the corresponding folder.
+
+Input:
+A list of file names and their cluster labels:
+
+[file_name_1] -> [cluster_label_1]
+[file_name_2] -> [cluster_label_1]
+[file_name_3] -> [cluster_label_2]
+...
+Clustering results: File names grouped into clusters.
+
+Output:
+For each cluster, output:
+
+Folder Name: [folder_name]
+  - [file_name_1]
+  - [file_name_2]
+  ...
+
+  
+Instructions:
+Choose a folder name that reflects the cluster's content.
+List all files in the cluster under the folder.
+Maintain consistent formatting.
