@@ -2,6 +2,9 @@ import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Set
 import { TextInputModal } from './modal';
 import { DEFAULT_OAI_MODEL, DEFAULT_MAX_TOKENS } from './settings'
 import { OpenAIAssistant } from './openai_api';
+import * as dotenv from 'dotenv'
+
+dotenv.config({path: '../../.env'})
 
 // Remember to rename these classes and interfaces!
 
@@ -9,7 +12,7 @@ interface MyPluginSettings {
 	journalFolder: string;
 	recallFolder: string;
 	huggingfaceApiKey: string;
-	openaiApiKey: string;
+	openaiApiKey: string | undefined;
 	openaiModelName: string;
 	maxTokenCount: number;
 }
@@ -18,7 +21,7 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	journalFolder: 'N/A',
 	recallFolder: 'N/A',
 	huggingfaceApiKey: '',
-	openaiApiKey: '',
+	openaiApiKey: process.env.OAI_API_KEY,
 	openaiModelName: DEFAULT_OAI_MODEL,
 	maxTokenCount: DEFAULT_MAX_TOKENS,
 }

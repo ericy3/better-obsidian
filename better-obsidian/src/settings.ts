@@ -14,3 +14,7 @@ export const ALL_MODELS = {
 };
 
 export const DEFAULT_MAX_TOKENS = 500;
+
+export const TEMPLATES_PATH = "../prompt_templates/"
+
+export const PROMPT_OUTPUT_PATH = "../created_prompts/"

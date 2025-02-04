@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv'
 dotenv.config({path: '../../.env'})
 
 export interface FileNames {
-	inputs: string[] | string;
+	inputs: string[];
 }
 
 interface FileLabels {
@@ -70,7 +70,7 @@ async function test_encoding(fileName1: string | null, fileName2: string | null)
         console.log("File names are empty.")
         return
     } else if (fileName1 != null && fileName2 == null) {
-        data = {"inputs": `${fileName1}`}
+        data = {"inputs": [`${fileName1}`]}
         return await group_files(data);
     } else {
         data = {"inputs": [`${fileName1}`, `${fileName2}`]}

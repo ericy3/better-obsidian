@@ -27,6 +27,7 @@
 		"@tensorflow/tfjs-node": "^4.22.0",
 		"dotenv": "^16.4.7",
 		"ml-hclust": "^3.1.0",
+		"openai": "^4.82.0",
 		"scikitjs": "^1.24.0",
 		"sklearn": "^1.0.0"
 	},
