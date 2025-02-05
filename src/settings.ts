@@ -13,7 +13,7 @@ export const ALL_MODELS = {
 	"claude-3-5-haiku-latest": "Claude 3.5 Haiku",
 };
 
-export const DEFAULT_MAX_TOKENS = 500;
+export const DEFAULT_MAX_TOKENS = 1000;
 
 export const TEMPLATES_PATH = "../prompt_templates/"
 

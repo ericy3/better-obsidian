@@ -25,9 +25,7 @@ Example of Output Format:
 For each cluster, output the following:
 
 Folder Name: [folder_name]
-  - [file_name_1]
-  - [file_name_2]
-  - [file_name_3]
+  [file_name_1, file_name_2, file_name_3]
   ...
 
 Task:

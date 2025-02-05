@@ -61,22 +61,22 @@ async function cluster_files(data: Array<Array<number>>): Promise<number[]| Arra
 }
 
 
-let fileName1 = "ABC.txt"
-let fileName2 = "CDE.txt"
-let data: FileNames;
+// let fileName1 = "ABC.txt"
+// let fileName2 = "CDE.txt"
+// let data: FileNames;
 
-async function test_encoding(fileName1: string | null, fileName2: string | null) {
-    if (fileName1 == null && fileName2 == null) {
-        console.log("File names are empty.")
-        return
-    } else if (fileName1 != null && fileName2 == null) {
-        data = {"inputs": [`${fileName1}`]}
-        return await group_files(data);
-    } else {
-        data = {"inputs": [`${fileName1}`, `${fileName2}`]}
-        return await group_files(data);
-    }
-}
+// async function test_encoding(fileName1: string | null, fileName2: string | null) {
+//     if (fileName1 == null && fileName2 == null) {
+//         console.log("File names are empty.")
+//         return
+//     } else if (fileName1 != null && fileName2 == null) {
+//         data = {"inputs": [`${fileName1}`]}
+//         return await group_files(data);
+//     } else {
+//         data = {"inputs": [`${fileName1}`, `${fileName2}`]}
+//         return await group_files(data);
+//     }
+// }
 
 
-test_encoding(fileName1, fileName2);
+// test_encoding(fileName1, fileName2);

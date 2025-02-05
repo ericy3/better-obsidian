@@ -1,5 +1,5 @@
 import { Notice, request } from "obsidian";
-
+import * as fs from 'fs';
 import { OpenAI } from "openai";
 
 export class OpenAIAssistant {
@@ -11,7 +11,7 @@ export class OpenAIAssistant {
 	constructor(apiKey: string | undefined, modelName: string, maxTokens: number) {
 		this.model = new OpenAI({
 			apiKey: apiKey,
-			dangerouslyAllowBrowser: false, //double check
+			dangerouslyAllowBrowser: true, //double check
 		});
 		this.modelName = modelName;
 		this.maxTokens = maxTokens;
@@ -27,12 +27,22 @@ export class OpenAIAssistant {
 	};
 
 	text_api_call = async (
-
+        prompt_path: string,
 	) => {
 		let model = this.modelName;
+        let maxTokens = this.maxTokens;
 		try {
-            const completion = await this.model.chat.
-
+            const content = fs.readFileSync(prompt_path, "utf8");
+            console.log(content)
+            const params = {
+                messages: [{ role: "developer", content: content }],
+                model: model,
+                max_completion_tokens: maxTokens,
+                store: true,
+            }
+            const completion = await this.model.chat.completions.create(params)
+            console.log(completion.choices[0].message.content)
+            return completion
 		} catch (err) {
 			this.display_error(err);
 		}

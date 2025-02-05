@@ -1,6 +1,8 @@
 import { App, Modal, TFile, Notice, TFolder } from 'obsidian';
 import { group_files } from './group_files';
 import { createFileFromTemplate } from './utils';
+import { OpenAIAssistant } from './openai_api';
+import { TEMPLATES_PATH, PROMPT_OUTPUT_PATH } from './settings';
 
 export class TextInputModal extends Modal {
     inputField: HTMLInputElement;
@@ -69,8 +71,14 @@ export class TextInputModal extends Modal {
 
 // Current folder generation does not create folders for files already in folders
 export class folderGenerateModal extends TextInputModal {
-    constructor(app: App) {
+    openaiAssistant: any;
+
+    constructor(
+        app: App, 
+        openAIassistant: OpenAIAssistant
+    ) {
         super(app)
+        this.openaiAssistant = openAIassistant
     }
     async onSubmit() {
         const inputText = this.inputField.value;
@@ -95,8 +103,11 @@ export class folderGenerateModal extends TextInputModal {
                         file_label_tuples.push((file_names[i], name_labels[i]));
                     }
                     template_values["INPUT VALUES"] = String(file_label_tuples);
-                    createFileFromTemplate("file_grouping_query.txt", template_values, "folder_generate_prompt.txt")
-
+                    const template_file = TEMPLATES_PATH + "file_grouping_query.txt"
+                    const prompt_file = PROMPT_OUTPUT_PATH + "folder_generate_prompt.txt"
+                    createFileFromTemplate(template_file, template_values, prompt_file)
+                    const response = this.openaiAssistant.text_api_call(prompt_file);
+                    console.log(response);
                 } else {
                     new Notice("Error clustering file names.")
                 }

@@ -1,10 +1,10 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import { TextInputModal } from './modal';
+import { TextInputModal, folderGenerateModal } from './modal';
 import { DEFAULT_OAI_MODEL, DEFAULT_MAX_TOKENS } from './settings'
 import { OpenAIAssistant } from './openai_api';
 import * as dotenv from 'dotenv'
 
-dotenv.config({path: '../../.env'})
+dotenv.config({path: '../.env'})
 
 // Remember to rename these classes and interfaces!
 
@@ -12,7 +12,7 @@ interface MyPluginSettings {
 	journalFolder: string;
 	recallFolder: string;
 	huggingfaceApiKey: string;
-	openaiApiKey: string | undefined;
+	openaiApiKey: string;
 	openaiModelName: string;
 	maxTokenCount: number;
 }
@@ -21,7 +21,7 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	journalFolder: 'N/A',
 	recallFolder: 'N/A',
 	huggingfaceApiKey: '',
-	openaiApiKey: process.env.OAI_API_KEY,
+	openaiApiKey: process.env.OAI_API_KEY || "",
 	openaiModelName: DEFAULT_OAI_MODEL,
 	maxTokenCount: DEFAULT_MAX_TOKENS,
 }
@@ -166,7 +166,7 @@ export default class MyPlugin extends Plugin {
 			id: 'generate-folders',
 			name: 'Generate Folders',
 			callback: () => {
-				
+				new folderGenerateModal(this.app, this.aiAssistant).open()
 			}
 		});
 
