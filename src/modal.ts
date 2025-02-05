@@ -1,5 +1,5 @@
 import { App, Modal, TFile, Notice, TFolder } from 'obsidian';
-import { group_files } from './group_files';
+import { HuggingFaceAssistant } from './hf_api';
 import { createFileFromTemplate } from './utils';
 import { OpenAIAssistant } from './openai_api';
 import { TEMPLATES_PATH, PROMPT_OUTPUT_PATH } from './settings';
@@ -71,14 +71,17 @@ export class TextInputModal extends Modal {
 
 // Current folder generation does not create folders for files already in folders
 export class folderGenerateModal extends TextInputModal {
-    openaiAssistant: any;
+    aiAssistant: any;
+    mlAssistant: any;
 
     constructor(
         app: App, 
-        openAIassistant: OpenAIAssistant
+        aiAssistant: OpenAIAssistant,
+        mlAssistant: HuggingFaceAssistant
     ) {
         super(app)
-        this.openaiAssistant = openAIassistant
+        this.aiAssistant = aiAssistant
+        this.mlAssistant = mlAssistant
     }
     async onSubmit() {
         const inputText = this.inputField.value;
@@ -96,7 +99,7 @@ export class folderGenerateModal extends TextInputModal {
                     name_to_files[entry.basename] = entry;
                 }
                 const file_names = Object.keys(name_to_files)
-                const name_labels: Array<number> | null = await group_files({inputs: file_names});
+                const name_labels: Array<number> | null = await this.mlAssistant.group_files({inputs: file_names});
                 let file_label_tuples = new Array<number>;
                 if (name_labels) {
                     for (let i = 0; i < name_labels.length; i++) {
@@ -106,7 +109,7 @@ export class folderGenerateModal extends TextInputModal {
                     const template_file = TEMPLATES_PATH + "file_grouping_query.txt"
                     const prompt_file = PROMPT_OUTPUT_PATH + "folder_generate_prompt.txt"
                     createFileFromTemplate(template_file, template_values, prompt_file)
-                    const response = this.openaiAssistant.text_api_call(prompt_file);
+                    const response = this.aiAssistant.text_api_call(prompt_file);
                     console.log(response);
                 } else {
                     new Notice("Error clustering file names.")

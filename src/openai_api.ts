@@ -6,9 +6,9 @@ export class OpenAIAssistant {
 	modelName: string;
 	model: any;
 	maxTokens: number;
-	apiKey: string | undefined;
+	apiKey: string;
 
-	constructor(apiKey: string | undefined, modelName: string, maxTokens: number) {
+	constructor(apiKey: string, modelName: string, maxTokens: number) {
 		this.model = new OpenAI({
 			apiKey: apiKey,
 			dangerouslyAllowBrowser: true, //double check

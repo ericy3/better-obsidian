@@ -2,6 +2,7 @@ import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Set
 import { TextInputModal, folderGenerateModal } from './modal';
 import { DEFAULT_OAI_MODEL, DEFAULT_MAX_TOKENS } from './settings'
 import { OpenAIAssistant } from './openai_api';
+import { HuggingFaceAssistant } from './hf_api';
 import * as dotenv from 'dotenv'
 
 dotenv.config({path: '../.env'})
@@ -28,19 +29,23 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
+	mlAssistant: HuggingFaceAssistant;
 	aiAssistant: OpenAIAssistant;
 
-	build_oai_api() {
+	build_api() {
 		this.aiAssistant = new OpenAIAssistant(
 			this.settings.openaiApiKey,
 			this.settings.openaiModelName,
 			this.settings.maxTokenCount,
 		);
+		this.mlAssistant = new HuggingFaceAssistant(
+			this.settings.huggingfaceApiKey,
+		);
 	}
 
 	async onload() {
 		await this.loadSettings();
-		this.build_oai_api();
+		this.build_api();
 
 		// This creates an icon in the left ribbon.
 		const randomizeIconEl = this.addRibbonIcon('dice', 'Diary Recall', (evt: MouseEvent) => {
@@ -166,7 +171,7 @@ export default class MyPlugin extends Plugin {
 			id: 'generate-folders',
 			name: 'Generate Folders',
 			callback: () => {
-				new folderGenerateModal(this.app, this.aiAssistant).open()
+				new folderGenerateModal(this.app, this.aiAssistant, this.mlAssistant).open()
 			}
 		});
 
@@ -285,6 +290,7 @@ class SampleSettingTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					this.plugin.settings.huggingfaceApiKey = value;
 					await this.plugin.saveSettings();
+					this.plugin.build_api();
 				}));
 		
 		new Setting(containerEl)
@@ -295,7 +301,7 @@ class SampleSettingTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					this.plugin.settings.openaiApiKey = value;
 					await this.plugin.saveSettings();
-					this.plugin.build_oai_api();
+					this.plugin.build_api();
 				}));
 		
 		new Setting(containerEl)
@@ -310,7 +316,7 @@ class SampleSettingTab extends PluginSettingTab {
 				} else {
 					this.plugin.settings.maxTokenCount = int_value;
 					await this.plugin.saveSettings();
-					this.plugin.build_oai_api();
+					this.plugin.build_api();
 				}
 			}));
 			
@@ -322,7 +328,7 @@ class SampleSettingTab extends PluginSettingTab {
 			.onChange(async (value) => {
 				this.plugin.settings.openaiModelName = value;
 				await this.plugin.saveSettings();
-				this.plugin.build_oai_api();
+				this.plugin.build_api();
 			}));
 	}
 }

@@ -1,4 +1,4 @@
-import { group_files, FileNames } from "../src/group_files";
+import { HuggingFaceModel, FileNames } from "../src/hf_api";
 
 let fileName1 = prompt("Enter a file name.")
 let fileName2 = prompt("Enter another file name.")
