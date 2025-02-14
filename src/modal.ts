@@ -1,8 +1,9 @@
 import { App, Modal, TFile, Notice, TFolder } from 'obsidian';
 import { HuggingFaceAssistant } from './hf_api';
-import { createFileFromTemplate } from './utils';
+import { createPromptFromTemplate } from './utils';
 import { OpenAIAssistant } from './openai_api';
 import { TEMPLATES_PATH, PROMPT_OUTPUT_PATH } from './settings';
+import { error } from 'console';
 
 export class TextInputModal extends Modal {
     inputField: HTMLInputElement;
@@ -86,7 +87,7 @@ export class folderGenerateModal extends TextInputModal {
     async onSubmit() {
         const inputText = this.inputField.value;
         if (inputText) {
-            console.log('User input:', inputText);
+            // console.log('User input:', inputText);
             const dir = inputText;
             if (this.app.vault.getFolderByPath(dir) != null) {
                 const name_to_files: { [key: string]: TFile } = {}
@@ -100,17 +101,26 @@ export class folderGenerateModal extends TextInputModal {
                 }
                 const file_names = Object.keys(name_to_files)
                 const name_labels: Array<number> | null = await this.mlAssistant.group_files({inputs: file_names});
-                let file_label_tuples = new Array<number>;
+                let file_label_tuples = new Array<[string, number]>();
+                console.log(file_names);
                 if (name_labels) {
                     for (let i = 0; i < name_labels.length; i++) {
-                        file_label_tuples.push((file_names[i], name_labels[i]));
+                        const file_label_tuple: [string, number] = [file_names[i], name_labels[i]];
+                        file_label_tuples.push(file_label_tuple);
                     }
-                    template_values["INPUT VALUES"] = String(file_label_tuples);
-                    const template_file = TEMPLATES_PATH + "file_grouping_query.txt"
-                    const prompt_file = PROMPT_OUTPUT_PATH + "folder_generate_prompt.txt"
-                    createFileFromTemplate(template_file, template_values, prompt_file)
-                    const response = this.aiAssistant.text_api_call(prompt_file);
-                    console.log(response);
+                    console.log(file_label_tuples.toString());
+                    template_values["INPUT_VALUES"] = file_label_tuples.toString();
+                    // const template_file = TEMPLATES_PATH + "file_grouping_query.txt"
+                    const template_type = "file_grouping_query"
+                    // const prompt_file = PROMPT_OUTPUT_PATH + "folder_generate_prompt.txt"
+                    const prompt = createPromptFromTemplate(template_type, template_values)
+                    if (prompt) {
+                        const response = this.aiAssistant.text_api_call(prompt);
+                        console.log(response);
+                    } else {
+                        console.log("Error creating prompt.")
+                        new Notice("Error creating prompt.")
+                    }
                 } else {
                     new Notice("Error clustering file names.")
                 }

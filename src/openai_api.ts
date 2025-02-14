@@ -27,15 +27,15 @@ export class OpenAIAssistant {
 	};
 
 	text_api_call = async (
-        prompt_path: string,
+        prompt: string,
 	) => {
 		let model = this.modelName;
         let maxTokens = this.maxTokens;
 		try {
-            const content = fs.readFileSync(prompt_path, "utf8");
-            console.log(content)
+            // const content = fs.readFileSync(prompt_path, "utf8");
+            console.log(prompt)
             const params = {
-                messages: [{ role: "developer", content: content }],
+                messages: [{ role: "developer", content: prompt }],
                 model: model,
                 max_completion_tokens: maxTokens,
                 store: true,
