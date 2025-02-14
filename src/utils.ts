@@ -24,10 +24,6 @@ export function createPromptFromTemplate(templateType: string, values: Record<st
     }
 }
 
-export function parseGeneratedOutput(output: string) {
-    
-}
-
 
 
 

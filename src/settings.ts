@@ -15,6 +15,8 @@ export const ALL_MODELS = {
 
 export const DEFAULT_MAX_TOKENS = 1000;
 
-export const TEMPLATES_PATH = "../prompt_templates/"
+export const TEMPLATES_PATH = "../prompt_templates/";
 
-export const PROMPT_OUTPUT_PATH = "../created_prompts/"
+export const PROMPT_OUTPUT_PATH = "../created_prompts/";
+
+export const GENERATED_PROMPT_REGEX = "Folder Name:\s*(.*?)\s*-\s*\[(.*?)\]";

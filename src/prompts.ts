@@ -40,8 +40,11 @@ const prompts: Record<string, string> = {
     Constraints:
     Ensure the folder names are meaningful and reflect the content of the files in each cluster.
     Each folder name must be concise but descriptive enough to give a clear idea of the files it contains.
-    Maintain consistency in the formatting of the output (each folder name followed by a list of files).`,
+    Maintain consistency in the formatting of the output (each folder name followed by a list of files).
+    If possible, prevent folder names from being too similar to an existing file name.`,
+    
 
 }
+
 
 export const PROMPTS = prompts;

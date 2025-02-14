@@ -3,7 +3,7 @@ import { HuggingFaceAssistant } from './hf_api';
 import { createPromptFromTemplate } from './utils';
 import { OpenAIAssistant } from './openai_api';
 import { TEMPLATES_PATH, PROMPT_OUTPUT_PATH } from './settings';
-import { error } from 'console';
+import { GENERATED_PROMPT_REGEX } from './settings';
 
 export class TextInputModal extends Modal {
     inputField: HTMLInputElement;
@@ -84,6 +84,19 @@ export class folderGenerateModal extends TextInputModal {
         this.aiAssistant = aiAssistant
         this.mlAssistant = mlAssistant
     }
+
+    parseGeneratedFolderName(response: string) {
+        let pattern = new RegExp(GENERATED_PROMPT_REGEX);
+        let matches = [...response.matchAll(pattern)];
+        let results = matches.map(match => ({
+            folderName: match[1], // First captured group (folder name)
+            contents: match[2].split(',').map(item => item.trim()) // Second captured group (contents)
+          }));
+        console.log(results);
+        return results
+    };
+
+
     async onSubmit() {
         const inputText = this.inputField.value;
         if (inputText) {
