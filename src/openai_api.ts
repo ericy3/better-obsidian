@@ -28,7 +28,7 @@ export class OpenAIAssistant {
 
 	text_api_call = async (
         prompt: string,
-	) => {
+	): Promise<string | null> => {
 		let model = this.modelName;
         let maxTokens = this.maxTokens;
 		try {
@@ -41,10 +41,11 @@ export class OpenAIAssistant {
                 store: true,
             }
             const completion = await this.model.chat.completions.create(params)
-            console.log(completion.choices[0].message.content)
-            return completion
+            console.log(typeof completion.choices[0].message.content)
+            return completion.choices[0].message.content
 		} catch (err) {
 			this.display_error(err);
+			return null;
 		}
 	};
 

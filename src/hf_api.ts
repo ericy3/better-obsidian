@@ -21,7 +21,7 @@ export class HuggingFaceAssistant {
     async group_files(data: FileNames): Promise<Array<number> | null> {
         const encoded_files = await this.encode_files(data);
         // let cluster_data: ClusterData = encode_files;
-        const file_labels: Array<number> = await this.cluster_files(encoded_files)
+        const file_labels: Array<number> | null = await this.cluster_files(encoded_files)
 
         return file_labels;
         // const grouped_files = await cluster_files(encode_files);
@@ -29,7 +29,6 @@ export class HuggingFaceAssistant {
 
 
     async encode_files(data: FileNames): Promise<Array<Array<number>>>{
-        console.log("KEY: " + this.apiKey)
         const response = await fetch(
             "https://api-inference.huggingface.co/models/BAAI/bge-base-en-v1.5",
             {
@@ -46,7 +45,7 @@ export class HuggingFaceAssistant {
         return result;
     }; 
 
-    async cluster_files(data: Array<Array<number>>): Promise<number[]| Array<number>> {
+    async cluster_files(data: Array<Array<number>>): Promise<null| Array<number>> {
         try {
             const requestBody = { inputs: data };
             const response = await fetch('http://localhost:8000/cluster', {
@@ -65,7 +64,7 @@ export class HuggingFaceAssistant {
             return result.labels;  // Return the clustering labels
         } catch (error) {
             console.error('Error fetching clustering data:', error);
-            return [];
+            return null;
         }
     };
 

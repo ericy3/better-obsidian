@@ -86,8 +86,14 @@ export class folderGenerateModal extends TextInputModal {
     }
 
     parseGeneratedFolderName(response: string) {
-        let pattern = new RegExp(GENERATED_PROMPT_REGEX);
-        let matches = [...response.matchAll(pattern)];
+        if (typeof response !== "string") {
+            console.error("Expected a string, but got:", response);
+            return []; // Return empty array to prevent further errors
+        }
+        const str = response;
+        // let pattern = new RegExp(GENERATED_PROMPT_REGEX, "g");
+        let matches = [...str.matchAll(GENERATED_PROMPT_REGEX)];
+        console.log(matches, GENERATED_PROMPT_REGEX, response);
         let results = matches.map(match => ({
             folderName: match[1], // First captured group (folder name)
             contents: match[2].split(',').map(item => item.trim()) // Second captured group (contents)
@@ -128,14 +134,17 @@ export class folderGenerateModal extends TextInputModal {
                     // const prompt_file = PROMPT_OUTPUT_PATH + "folder_generate_prompt.txt"
                     const prompt = createPromptFromTemplate(template_type, template_values)
                     if (prompt) {
-                        const response = this.aiAssistant.text_api_call(prompt);
-                        console.log(response);
+                        const response = await this.aiAssistant.text_api_call(prompt);
+                        console.log(String(response));
+                        const generated_folders = this.parseGeneratedFolderName(response);
                     } else {
                         console.log("Error creating prompt.")
                         new Notice("Error creating prompt.")
+                        this.close();
                     }
+
                 } else {
-                    new Notice("Error clustering file names.")
+                    new Notice("Model may be loading, please wait a few seconds.");
                 }
             }
 
