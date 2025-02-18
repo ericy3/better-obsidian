@@ -19,4 +19,4 @@ export const TEMPLATES_PATH = "../prompt_templates/";
 
 export const PROMPT_OUTPUT_PATH = "../created_prompts/";
 
-export const GENERATED_PROMPT_REGEX = /Folder Name:\s*(.+?)\s*-\s*\[((?:.*\s*)(?:,\s*.*\s*)*)]/g;
+export const GENERATED_PROMPT_REGEX = /Folder Name:\s*\[(.+?)\]\s*-\s*\[((?:.*\s*)(?:,\s*.*\s*)*)]/g;

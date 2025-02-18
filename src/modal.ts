@@ -112,6 +112,7 @@ export class folderGenerateModal extends TextInputModal {
     // Returns False if error occurs and True otherwise
     async createAndUpdateFolders(dir: string, name_to_files: { [key: string]: TFile }, folders: Array<Folder>) {
         for (const folder of folders) {
+            console.log(folder.folderName)
             const new_dir = `${dir}/${folder.folderName}`;
             const new_folder = await this.app.vault.createFolder(new_dir);
             if (!new_folder) {
@@ -124,20 +125,19 @@ export class folderGenerateModal extends TextInputModal {
                         const file_path = new_dir + `/${file_name}.${file_obj.extension}`;
                         await this.app.vault.rename(file_obj, file_path);    
                     } else {
-                        new Notice("Early stoppage - one of files doesn't exist.")
+                        new Notice("Early stoppage - one of the files doesn't exist.")
                         return false;
                     }             
                 }
             }
-            return true;
         }
+        return true;
     };
 
 
     async onSubmit() {
         const inputText = this.inputField.value;
         if (inputText) {
-            // console.log('User input:', inputText);
             const dir = inputText;
             if (this.app.vault.getFolderByPath(dir) != null) {
                 const name_to_files: { [key: string]: TFile } = {};

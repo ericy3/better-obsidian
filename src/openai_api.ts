@@ -41,7 +41,7 @@ export class OpenAIAssistant {
                 store: true,
             }
             const completion = await this.model.chat.completions.create(params)
-            console.log(typeof completion.choices[0].message.content)
+            // console.log(typeof completion.choices[0].message.content)
             return completion.choices[0].message.content
 		} catch (err) {
 			this.display_error(err);
