@@ -5,6 +5,11 @@ import { OpenAIAssistant } from './openai_api';
 import { TEMPLATES_PATH, PROMPT_OUTPUT_PATH } from './settings';
 import { GENERATED_PROMPT_REGEX } from './settings';
 
+interface Folder {
+    folderName: string;
+    files: string[];
+}
+
 export class TextInputModal extends Modal {
     inputField: HTMLInputElement;
 
@@ -85,7 +90,8 @@ export class folderGenerateModal extends TextInputModal {
         this.mlAssistant = mlAssistant
     }
 
-    parseGeneratedFolderName(response: string) {
+
+    parseGeneratedFolderName(response: string): Array<Folder> {
         if (typeof response !== "string") {
             console.error("Expected a string, but got:", response);
             return []; // Return empty array to prevent further errors
@@ -96,10 +102,35 @@ export class folderGenerateModal extends TextInputModal {
         console.log(matches, GENERATED_PROMPT_REGEX, response);
         let results = matches.map(match => ({
             folderName: match[1], // First captured group (folder name)
-            contents: match[2].split(',').map(item => item.trim()) // Second captured group (contents)
+            files: match[2].split(',').map(item => item.trim()) // Second captured group (contents)
           }));
         console.log(results);
         return results
+    };
+
+    // Creates folders with given folder names and inputs files into folders
+    // Returns False if error occurs and True otherwise
+    async createAndUpdateFolders(dir: string, name_to_files: { [key: string]: TFile }, folders: Array<Folder>) {
+        for (const folder of folders) {
+            const new_dir = `${dir}/${folder.folderName}`;
+            const new_folder = await this.app.vault.createFolder(new_dir);
+            if (!new_folder) {
+                new Notice("Error creating folder or folder already exists.");
+                return false;
+            } else {
+                for (const file_name of folder.files) {
+                    const file_obj: TFile = name_to_files[file_name];
+                    if (file_obj) {
+                        const file_path = new_dir + `/${file_name}.${file_obj.extension}`;
+                        await this.app.vault.rename(file_obj, file_path);    
+                    } else {
+                        new Notice("Early stoppage - one of files doesn't exist.")
+                        return false;
+                    }             
+                }
+            }
+            return true;
+        }
     };
 
 
@@ -109,8 +140,8 @@ export class folderGenerateModal extends TextInputModal {
             // console.log('User input:', inputText);
             const dir = inputText;
             if (this.app.vault.getFolderByPath(dir) != null) {
-                const name_to_files: { [key: string]: TFile } = {}
-                const template_values: { [key: string]: string } = {}
+                const name_to_files: { [key: string]: TFile } = {};
+                const template_values: { [key: string]: string } = {};
                 const shallow_entries = this.app.vault.getFiles().filter(f => {
                     const relativePath = f.path.slice(dir.length); // Get path after the given directory
                     return relativePath.startsWith('/') && !relativePath.slice(1).includes('/');
@@ -121,7 +152,6 @@ export class folderGenerateModal extends TextInputModal {
                 const file_names = Object.keys(name_to_files)
                 const name_labels: Array<number> | null = await this.mlAssistant.group_files({inputs: file_names});
                 let file_label_tuples = new Array<[string, number]>();
-                console.log(file_names);
                 if (name_labels) {
                     for (let i = 0; i < name_labels.length; i++) {
                         const file_label_tuple: [string, number] = [file_names[i], name_labels[i]];
@@ -137,6 +167,7 @@ export class folderGenerateModal extends TextInputModal {
                         const response = await this.aiAssistant.text_api_call(prompt);
                         console.log(String(response));
                         const generated_folders = this.parseGeneratedFolderName(response);
+                        const success = await this.createAndUpdateFolders(dir, name_to_files, generated_folders);
                     } else {
                         console.log("Error creating prompt.")
                         new Notice("Error creating prompt.")
