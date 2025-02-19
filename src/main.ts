@@ -1,24 +1,51 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
-import { TextInputModal } from 'modal';
+import { TextInputModal, folderGenerateModal } from './modal';
+import { DEFAULT_OAI_MODEL, DEFAULT_MAX_TOKENS } from './settings'
+import { OpenAIAssistant } from './openai_api';
+import { HuggingFaceAssistant } from './hf_api';
+import * as dotenv from 'dotenv'
+
+dotenv.config({path: '../.env'})
 
 // Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
 	journalFolder: string;
 	recallFolder: string;
+	huggingfaceApiKey: string;
+	openaiApiKey: string;
+	openaiModelName: string;
+	maxTokenCount: number;
 }
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
 	journalFolder: 'N/A',
 	recallFolder: 'N/A',
-
+	huggingfaceApiKey: '',
+	openaiApiKey: process.env.OAI_API_KEY || "",
+	openaiModelName: DEFAULT_OAI_MODEL,
+	maxTokenCount: DEFAULT_MAX_TOKENS,
 }
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
+	mlAssistant: HuggingFaceAssistant;
+	aiAssistant: OpenAIAssistant;
+
+	build_api() {
+		this.aiAssistant = new OpenAIAssistant(
+			this.settings.openaiApiKey,
+			this.settings.openaiModelName,
+			this.settings.maxTokenCount,
+		);
+		this.mlAssistant = new HuggingFaceAssistant(
+			this.settings.huggingfaceApiKey,
+		);
+	}
 
 	async onload() {
 		await this.loadSettings();
+		this.build_api();
 
 		// This creates an icon in the left ribbon.
 		const randomizeIconEl = this.addRibbonIcon('dice', 'Diary Recall', (evt: MouseEvent) => {
@@ -115,7 +142,6 @@ export default class MyPlugin extends Plugin {
 		});
 
 		organizeIconEl.addClass('organize-ribbon-class');
-
 		
 
 		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
@@ -139,6 +165,16 @@ export default class MyPlugin extends Plugin {
 				new TextInputModal(this.app).open();
 			}
 		});
+
+		// Given a folder or directory utilize algorithm to create folder names and organize
+		this.addCommand({
+			id: 'generate-folders',
+			name: 'Generate Folders',
+			callback: () => {
+				new folderGenerateModal(this.app, this.aiAssistant, this.mlAssistant).open()
+			}
+		});
+
 		// This adds an editor command that can perform some operation on the current editor instance
 		this.addCommand({
 			id: 'sample-editor-command',
@@ -244,7 +280,55 @@ class SampleSettingTab extends PluginSettingTab {
 				.onChange(async (value) => {
 					this.plugin.settings.recallFolder = value;
 					await this.plugin.saveSettings();
-				})
-				)
+				}));
+
+		new Setting(containerEl)
+			.setName('HuggingFace API Token')
+			.addText(text => text
+				.setPlaceholder('N/A')
+				.setValue(this.plugin.settings.huggingfaceApiKey)
+				.onChange(async (value) => {
+					this.plugin.settings.huggingfaceApiKey = value;
+					await this.plugin.saveSettings();
+					this.plugin.build_api();
+				}));
+		
+		new Setting(containerEl)
+			.setName('OpenAI API Token')
+			.addText(text => text
+				.setPlaceholder('N/A')
+				.setValue(this.plugin.settings.openaiApiKey)
+				.onChange(async (value) => {
+					this.plugin.settings.openaiApiKey = value;
+					await this.plugin.saveSettings();
+					this.plugin.build_api();
+				}));
+		
+		new Setting(containerEl)
+		.setName('OpenAI Max Token Count')
+		.addText(text => text
+			.setPlaceholder("500")
+			.setValue(this.plugin.settings.maxTokenCount.toString())
+			.onChange(async (value) => {
+				const int_value = parseInt(value);
+				if (!int_value || int_value <= 0) {
+					new Notice("Error while parsing maxTokens ");
+				} else {
+					this.plugin.settings.maxTokenCount = int_value;
+					await this.plugin.saveSettings();
+					this.plugin.build_api();
+				}
+			}));
+			
+		new Setting(containerEl)
+		.setName('OpenAI Model Name')
+		.addText(text => text
+			.setPlaceholder(DEFAULT_OAI_MODEL)
+			.setValue(this.plugin.settings.openaiModelName)
+			.onChange(async (value) => {
+				this.plugin.settings.openaiModelName = value;
+				await this.plugin.saveSettings();
+				this.plugin.build_api();
+			}));
 	}
 }

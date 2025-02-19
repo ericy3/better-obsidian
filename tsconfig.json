@@ -4,7 +4,7 @@
     "inlineSourceMap": true,
     "inlineSources": true,
     "module": "ESNext",
-    "target": "ES6",
+    "target": "es2017", // ES6
     "allowJs": true,
     "noImplicitAny": true,
     "moduleResolution": "node",
@@ -19,6 +19,8 @@
     ]
   },
   "include": [
-    "**/*.ts"
-  ]
+    "**/*.ts",
+    "**/**/*.ts",
+    "**/*.txt"
+, "icon-library.ts"  ]
 }

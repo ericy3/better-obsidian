@@ -10,7 +10,7 @@ The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definiti
 ### Organize Daily Notes
 
 Create a folder to store all your daily notes of format `YYYY-MM-DD [- {TOPIC}]`. 
-After doing so, to the settings tab and under **Community Plugins** and the Better Obsidian tab, update the folder name from "N/A" to the path/to/diary/folder from vault root.
+After doing so, to the settings tab and under **Community Plugins** and the Better Obsidian tab, update the folder name from "N/A" to the `path/to/diary/folder`` from vault root.
 Then click the folder icon on the left side of the app window and it should create year folders, month folders within each year, and place the notes into the appropriate folders.
 Notes not in the `YYYY-MM-DD` format will be directly under the setting specified folder.
 This organize button also works off folders created from previous calls, allowing new files to be placed into the existing year and month folders.
@@ -27,6 +27,13 @@ This is a command that can be found by using the `Ctrl-P` on Windows and `Cmd-P`
 Selecting this will open up a pop up in which you will be able to submit a path or folder name given the vault root as the root.
 Unpack Folder removes all folders, nested folders included, inside the specified folder. The files will not be deleted, remaining inside this folder.
 This is helpful in revamping vault structure in cases of folder organzation.
+
+### AI-Powered Folder Organization (In Progress)
+
+This is a command that will allow you to enter a directory or path to a directory. 
+All the files in this directory will be passed into a pipeline which will clusters files using text encoding and DBSCAN.
+The clustered files with their labels will then be passed to a query to an OpenAI GPT model for folder name generation.
+The files will then be automatically organized into their appropriate folder based on the model output.
 
 
 ## Manually installing the plugin
