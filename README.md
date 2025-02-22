@@ -27,13 +27,14 @@ This is a command that can be found by using the `Ctrl-P` on Windows and `Cmd-P`
 Selecting this will open up a pop up in which you will be able to submit a path or folder name given the vault root as the root.
 Unpack Folder removes all folders, nested folders included, inside the specified folder. The files will not be deleted, remaining inside this folder.
 This is helpful in revamping vault structure in cases of folder organzation.
+![me](./demo/unpack_folder.gif)
 
-### AI-Powered Folder Organization (In Progress)
+### Automated Folder Generation
 
-This is a command that will allow you to enter a directory or path to a directory. 
-All the files in this directory will be passed into a pipeline which will clusters files using text encoding and DBSCAN.
-The clustered files with their labels will then be passed to a query to an OpenAI GPT model for folder name generation.
-The files will then be automatically organized into their appropriate folder based on the model output.
+This is a command that allows you to enter a directory to automate folder generatoin and the corresponding file sorting. 
+All the file names in this directory will be passed into a pipeline which will be vectorized through a text embedding model (bge-base-en-v1.5), and then clustered using DBSCAN. The clustered files with their labels will then be passed to a query to an OpenAI GPT model for folder name generation.
+Upon receiving these folder names, the files will be automatically organized into their appropriate folder.
+![me](./demo/generate_folder.gif)
 
 
 ## Manually installing the plugin
